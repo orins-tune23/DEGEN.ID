@@ -174,7 +174,7 @@ export async function fetchWalletTokenList(
   return data.items ?? [];
 }
 
-/** Calls /v1/wallet/tx_list to fetch complete transaction history for a wallet */
+/** Calls /v1/wallet/tx/list to fetch complete transaction history for a wallet */
 export async function fetchWalletTransactions(
   wallet: string
 ): Promise<BirdeyeTransaction[]> {
@@ -190,7 +190,7 @@ export async function fetchWalletTransactions(
       [key: string]: unknown;
     }
     const data = await birdeyeFetch<TxListResponse>(
-      "/v1/wallet/tx_list",
+      "/v1/wallet/tx/list",
       wallet,
       { wallet, offset: String(offset), limit: String(limit), tx_type: "swap" }
     );
@@ -280,11 +280,21 @@ export async function fetchAllWalletData(
   const apiKey = getApiKey();
   if (!apiKey) return null;
 
-  const [holdings, transactions, newListings] = await Promise.all([
+  const [holdings, transactions] = await Promise.all([
     fetchWalletTokenList(wallet),
     fetchWalletTransactions(wallet),
-    fetchNewListings(),
   ]);
+
+  let newListings: BirdeyeNewListing[] = [];
+  try {
+    newListings = await fetchNewListings();
+  } catch (err) {
+    if (err instanceof BirdeyeApiError) {
+      console.error(`Skipping new listing enrichment: ${err.message}`);
+    } else {
+      throw err;
+    }
+  }
 
   const tokenAddresses = new Set<string>();
   for (const h of holdings) {

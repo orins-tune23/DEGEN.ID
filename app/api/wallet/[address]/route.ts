@@ -50,13 +50,21 @@ export async function GET(
     cacheReport(report);
     return NextResponse.json(report);
   } catch (err) {
-    const message =
-      err instanceof BirdeyeApiError
-        ? `Birdeye API error: ${err.message}`
-        : "Failed to analyse wallet. Please try again.";
     console.error("Wallet analysis error:", err);
+
+    if (err instanceof BirdeyeApiError) {
+      const status = err.statusCode === 401 || err.statusCode === 403 ? 502 : 500;
+      const detail =
+        err.statusCode === 401
+          ? "Birdeye API key is invalid or the required endpoint is not enabled on your plan. Check BIRDEYE_API_KEY and plan access."
+          : err.statusCode === 403
+            ? "Birdeye API key does not have permission for this endpoint. Verify plan access."
+            : `Birdeye API error: ${err.message}`;
+      return NextResponse.json({ error: detail }, { status });
+    }
+
     return NextResponse.json(
-      { error: message },
+      { error: "Failed to analyse wallet. Please try again." },
       { status: 500 }
     );
   }

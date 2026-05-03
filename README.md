@@ -13,7 +13,7 @@ DEGEN.ID is a Solana wallet personality profiler. Paste any wallet address and g
 | Endpoint | Purpose |
 |---|---|
 | `/v1/wallet/token_list` | Fetch full token holdings and USD values for a wallet |
-| `/v1/wallet/tx_list` | Retrieve complete swap transaction history |
+| `/v1/wallet/tx/list` | Retrieve complete swap transaction history |
 | `/defi/token_overview` | Token metadata — liquidity, market cap, creation date |
 | `/defi/price` | Current token prices for P&L calculation |
 | `/defi/ohlcv` | Historical OHLCV candles for entry/exit timing analysis |
@@ -77,7 +77,7 @@ All Birdeye API calls are server-side only. The API key is never exposed to the 
 │  │   lib/birdeye.ts      │  │   lib/db.ts        │     │
 │  │                       │  │   better-sqlite3   │     │
 │  │  • token_list         │  │                    │     │
-│  │  • tx_list            │  │  • wallet reports  │     │
+│  │  • tx/list            │  │  • wallet reports  │     │
 │  │  • token_overview     │  │  • leaderboard     │     │
 │  │  • price              │  │  • 10min TTL       │     │
 │  │  • ohlcv              │  │                    │     │
